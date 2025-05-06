@@ -1,0 +1,49 @@
+:root {
+  /* Primary brand colors (purple shades) */
+  --primary-color: #a78bfa;         /* Light purple */
+  --primary-hover: #8b5cf6;         /* Medium purple */
+
+  /* Backgrounds */
+  --background-color: #1a1625;      /* Deep purple-black */
+  --surface-color: #262035;         /* Card/chat surface */
+  --input-background: #2e2542;      /* Input fields */
+  --chat-bubble-user: #8b5cf61a;    /* Transparent user bubble */
+  --chat-bubble-ai: #2f2842;        /* AI bubble */
+
+  /* Text colors */
+  --text-color: #f3f0ff;            /* Near-white */
+  --text-secondary: #d1c2f0;
+  --text-muted: #a29bbf;
+
+  /* Borders and dividers */
+  --border-color: #3e3453;
+  --divider-color: #2d243d;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #5b4b7e;
+  --scrollbar-track: #1a1625;
+
+  /* Alerts and status colors (adjusted for theme) */
+  --error-color: #f87171;           /* Soft red */
+  --success-color: #4ade80;         /* Soft green */
+  --warning-color: #facc15;         /* Yellow */
+  --info-color: #7dd3fc;            /* Light blue */
+
+  /* Other */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --border-radius: 0.5rem;
+  --transition-speed: 0.3s;
+}
+
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--background-color);
+}

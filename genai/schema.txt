@@ -1,0 +1,6 @@
+employees table with columns:
+- id (int, primary key, auto increment)
+- name (string)
+- role (string)
+- salary (int)
+- join_date (date)
