@@ -19,7 +19,7 @@ const App = () => {
   const fetchTableData = () => {
     fetch("http://127.0.0.1:8000/table")
       .then((res) => res.json())
-      .then((data) => setTableData(data.data))
+      .then((data) => setTableData(data.data.result))
       .catch((err) => console.error(err));
   };
 
@@ -37,43 +37,64 @@ const App = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-
+  
     const userMessage = { role: 'user', content: input };
     const aiTypingMessage = { role: 'ai', content: <><RiRobot2Line /> &nbsp; ...</> };
-
+  
     const newMessages = [...messages, userMessage, aiTypingMessage];
     setMessages(newMessages);
     setInput('');
-
+  
     try {
       const response = await fetch("http://127.0.0.1:8000/query", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: input })
       });
-
+  
       const data = await response.json();
       console.log(data);
-
+  
       const formattedSql = cleanSqlString(data.sql);
-      let resultTable = null;
-      if (Array.isArray(data.result)) {
-        resultTable = <NativeTable data={data.result} />;
+      let resultContent = null;
+  
+      const result = data.result?.result;
+      const responseType = data.result?.response_type;
+  
+      if (responseType === "table" && Array.isArray(result)) {
+        resultContent = <NativeTable data={result} />;
+      } else if (responseType === "status") {
+        resultContent = (
+          <div style={{display: "flex", alignItems: "center"}}>
+            <RiRobot2Line size={24} /> &nbsp; <strong>Status:</strong> {result?.status || "Unknown"}
+          </div>
+        );
+      } else if (responseType === "aggregate" && typeof result === "object") {
+        resultContent = (
+          <div style={{display: "flex", alignItems: "center"}}>
+            <RiRobot2Line size={24} /> &nbsp;
+            {Object.entries(result).map(([key, value]) => (
+              <span key={key}><strong>{key}</strong>: {value}</span>
+            ))}
+          </div>
+        );
+      } else {
+        resultContent = <div><RiRobot2Line size={24} /> &nbsp; Error: Unexpected response type.</div>;
       }
-
+  
       const updatedMessages = [...newMessages];
       updatedMessages[updatedMessages.length - 1] = {
         role: 'ai',
         content: (
           <div>
-            <div style={{ marginBottom: `${resultTable != null ? "20px" : "0px"}` }}>
+            <div style={{ marginBottom: resultContent ? "20px" : "0px" }}>
               <RiRobot2Line size={24} /> &nbsp; <code>{formattedSql}</code>
             </div>
-            {resultTable}
+            {resultContent}
           </div>
         ),
       };
-
+  
       setMessages(updatedMessages);
     } catch (err) {
       console.error(err);
@@ -87,6 +108,8 @@ const App = () => {
       fetchTableData();
     }
   };
+  
+  
 
   return (
     <div className="app">

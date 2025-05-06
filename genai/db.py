@@ -1,7 +1,3 @@
-import time
-import mysql.connector
-from mysql.connector import Error
-
 import mysql.connector
 from mysql.connector import Error
 
@@ -16,34 +12,53 @@ def execute_sql(query):
             password="root",
             database="genai"
         )
-        if conn.is_connected():
-            print(f"✅ Connected: {conn}")
-        else:
+        if not conn.is_connected():
             print("⚠️ Connection object exists but not connected.")
             return {"error": "MySQL Connection not available."}
 
-        # Clean query if it contains markdown formatting
+        print(f"✅ Connected: {conn}")
+
+        # Clean markdown if present
         query = query.strip().strip("```sql").strip("```").strip()
 
         cursor = conn.cursor(dictionary=True)
         cursor.execute(query)
         print(f"Executed SQL: {query}")
 
-        if query.lower().startswith("select"):
-            result = cursor.fetchall()
+        result = []
+        response_type = "unknown"
+
+        if cursor.with_rows:  # This checks if the query returned any rows (e.g., SELECT)
+            if any(agg in query.lower() for agg in ["avg", "sum", "count", "min", "max"]):
+                result = cursor.fetchone()
+                response_type = "aggregate"
+            else:
+                result = cursor.fetchall()
+                response_type = "table"
         else:
             conn.commit()
             result = {"status": "success"}
+            response_type = "status"
+
+        # ✅ Ensure result is read before closing cursor
+        cursor.fetchall() if cursor.with_rows and result is None else None
 
     except mysql.connector.Error as err:
         print(f"Query Error: {err}")
         result = {"error": str(err)}
+        response_type = "error"
 
     finally:
         print("----------DONE----------")
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals() and conn.is_connected():
-            conn.close()
+        try:
+            if cursor:
+                cursor.close()
+        except Exception as e:
+            print(f"Cursor close error: {e}")
+        try:
+            if conn and conn.is_connected():
+                conn.close()
+        except Exception as e:
+            print(f"Connection close error: {e}")
 
-    return result
+    return {"result": result, "response_type": response_type}
