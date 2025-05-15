@@ -1,45 +1,43 @@
-import React from 'react';
 import './NativeTable.css';
 import { BsFolder } from "react-icons/bs";
 
 const NativeTable = ({ data }) => {
-  console.log("data", data);
-  
+  // Extract headers dynamically from the first row of the data
+  const headers = data && data.length > 0 ? Object.keys(data[0]) : [];
+
   return (
     <table className="native-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Salary</th>
-          <th>Join Date</th>
+          {headers.map((header) => (
+            <th key={header}>{header.replace(/_/g, ' ').toUpperCase()}</th>
+          ))}
         </tr>
       </thead>
       <tbody>
         {!Array.isArray(data) || data.length === 0 ? (
           <tr>
-            <td colSpan={5}>
-              <div style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "2rem 0",
-                color: "var(--text-muted)"
-              }}>
+            <td colSpan={headers.length || 1}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  padding: "2rem 0",
+                  color: "var(--text-muted)"
+                }}
+              >
                 <BsFolder size={48} />
                 <h3 style={{ marginTop: '1rem' }}>No Results</h3>
               </div>
             </td>
           </tr>
         ) : (
-          data.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.name}</td>
-              <td>{item.role}</td>
-              <td>{item.salary}</td>
-              <td>{item.join_date || '—'}</td>
+          data.map((item, index) => (
+            <tr key={index}>
+              {headers.map((header) => (
+                <td key={header}>{item[header] || '—'}</td>
+              ))}
             </tr>
           ))
         )}

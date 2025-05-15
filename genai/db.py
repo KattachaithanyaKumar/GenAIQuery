@@ -28,20 +28,17 @@ def execute_sql(query):
         result = []
         response_type = "unknown"
 
-        if cursor.with_rows:  # This checks if the query returned any rows (e.g., SELECT)
+        if cursor.with_rows:
             if any(agg in query.lower() for agg in ["avg", "sum", "count", "min", "max"]):
-                result = cursor.fetchone()
                 response_type = "aggregate"
             else:
-                result = cursor.fetchall()
                 response_type = "table"
+            result = cursor.fetchall()
+
         else:
             conn.commit()
             result = {"status": "success"}
             response_type = "status"
-
-        # ✅ Ensure result is read before closing cursor
-        cursor.fetchall() if cursor.with_rows and result is None else None
 
     except mysql.connector.Error as err:
         print(f"Query Error: {err}")

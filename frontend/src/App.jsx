@@ -73,9 +73,21 @@ const App = () => {
         resultContent = (
           <div style={{display: "flex", alignItems: "center"}}>
             <RiRobot2Line size={24} /> &nbsp;
-            {Object.entries(result).map(([key, value]) => (
-              <span key={key}><strong>{key}</strong>: {value}</span>
-            ))}
+            {result.length > 1 ? (
+              <NativeTable data={result} />
+            ) : (
+              <>
+                {result.map((item, index) => (
+                  <div key={index}>
+                    {Object.entries(item).map(([key, value]) => (
+                      <span key={key}>
+                        <strong>{key}</strong>: {value} <br />
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         );
       } else {

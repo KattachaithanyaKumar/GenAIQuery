@@ -18,6 +18,7 @@ You are a SQL expert. Based on this schema:
 {schema_description}
 
 if some information is not given try to give some placeholder values not like (employee1, employee2, etc) make sure to give proper names in all the values
+if you are fetching some records make sure to fetch all the columns and never fetch with some columns missing expect when asked specifically.
 
 Convert the following natural language request to SQL:
 
